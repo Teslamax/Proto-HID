@@ -1,2 +1,7 @@
 #pragma once
-void send_midi_cc(int cc, int value); void send_midi_note(int note, bool on);
+
+// Send a MIDI Control Change (CC) message
+void send_midi_cc(uint8_t cc_number, uint8_t value);
+
+// Send a MIDI Note On or Note Off message
+void send_midi_note(uint8_t note_number, bool on);
