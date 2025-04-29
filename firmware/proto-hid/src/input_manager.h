@@ -1,2 +1,7 @@
 #pragma once
-void init_inputs(); void update_inputs();
+
+// Initialize I2C devices (encoders, keypad)
+void init_inputs();
+
+// Poll I2C devices and process inputs (rotation, button presses)
+void update_inputs();
