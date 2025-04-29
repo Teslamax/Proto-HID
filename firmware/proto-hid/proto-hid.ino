@@ -1,14 +1,15 @@
 // proto-hid.ino - Main sketch for Proto-HID controller
-// Hardware: SparkFun Pro Micro (ATmega32U4), Adafruit Seesaw I2C devices
-// Function: USB MIDI + CLI control using rotary encoders + NeoKey 1x4
+// Hardware: SparkFun Qwiic Pro Micro (ATmega32U4, USB-C)
+// Function: USB MIDI + CLI control using rotary encoders + NeoKey 1x4 keypad
 
 #include "src/input_manager.h"
 #include "src/midi_manager.h"
 #include "src/cli_parser.h"
+#include "src/config.h"
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial); // Wait for USB Serial
+  while (!Serial) { delay(10); } // Wait for USB Serial
 
   cli_parser_init();
   init_inputs();
