@@ -53,7 +53,6 @@ void init_inputs() {
     logInfo("NeoKey 1x4 initialized.");
   }
 
-  // Reset encoder position tracking
   encoder1_position = encoder1.getEncoderPosition();
   encoder2_position = encoder2.getEncoderPosition();
 }
@@ -78,12 +77,16 @@ void update_inputs() {
   // Read encoders
   int32_t current_encoder1 = encoder1.getEncoderPosition();
   int32_t current_encoder2 = encoder2.getEncoderPosition();
-  bool current_encoder1_button = !encoder1.digitalRead(24); // 24 = built-in encoder switch
-  bool current_encoder2_button = !encoder2.digitalRead(24); // 24 = built-in encoder switch
+  bool current_encoder1_button = !encoder1.digitalRead(24); // Active LOW
+  bool current_encoder2_button = !encoder2.digitalRead(24); // Active LOW
 
-  // Read NeoKey
-  uint32_t buttons = neokey.readBulkButtons();
-  uint8_t current_neokey = (buttons & 0xF); // 4 keys (bit0..bit3)
+  // Read NeoKey buttons manually
+  uint8_t current_neokey = 0;
+  for (uint8_t i = 0; i < 4; i++) {
+    if (!neokey.digitalRead(i)) { // Active LOW
+      current_neokey |= (1 << i);
+    }
+  }
 
   encoder1_position = current_encoder1;
   encoder2_position = current_encoder2;
@@ -116,11 +119,10 @@ void update_inputs() {
     }
 
     if (changed) {
-      // Optionally pulse LED or do other activity here
+      // Optional: pulse LED on input change
     }
   }
 
-  // Save last states
   last_encoder1_position = encoder1_position;
   last_encoder2_position = encoder2_position;
   last_encoder1_button = encoder1_button_pressed;
