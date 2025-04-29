@@ -1,41 +1,18 @@
 // input_manager.cpp - Handles I2C rotary encoders and keypad input for Proto-HID
 
-#include <Adafruit_seesaw.h>
-
-Adafruit_seesaw encoder1;
-Adafruit_seesaw encoder2;
-Adafruit_seesaw neokey;
-
-void init_inputs() {
-  Wire.begin();
-  logInfo("I2C initialized for input devices.");
-
-  if (!encoder1.begin(ENCODER1_ADDR)) {
-    logError("Failed to find Encoder 1 at 0x%02X", ENCODER1_ADDR);
-  } else {
-    logInfo("Encoder 1 initialized.");
-  }
-
-  if (!encoder2.begin(ENCODER2_ADDR)) {
-    logError("Failed to find Encoder 2 at 0x%02X", ENCODER2_ADDR);
-  } else {
-    logInfo("Encoder 2 initialized.");
-  }
-
-  if (!neokey.begin(NEOKEY_ADDR)) {
-    logError("Failed to find NeoKey 1x4 at 0x%02X", NEOKEY_ADDR);
-  } else {
-    logInfo("NeoKey 1x4 initialized.");
-  }
-}
-
-
 #include <Arduino.h>
 #include <Wire.h>
 #include "input_manager.h"
 #include "config.h"
 #include "cli_parser.h"
 #include "midi_manager.h"
+
+#include <Adafruit_seesaw.h>
+
+Adafruit_seesaw encoder1;
+Adafruit_seesaw encoder2;
+Adafruit_seesaw neokey;
+
 
 // Placeholder addresses for devices
 #define ENCODER1_ADDR  0x36
@@ -60,7 +37,23 @@ void init_inputs() {
   Wire.begin();
   logInfo("I2C initialized for input devices.");
 
-  // Future: Initialize Seesaw devices properly
+  if (!encoder1.begin(ENCODER1_ADDR)) {
+    logError("Failed to find Encoder 1 at 0x%02X", ENCODER1_ADDR);
+  } else {
+    logInfo("Encoder 1 initialized.");
+  }
+
+  if (!encoder2.begin(ENCODER2_ADDR)) {
+    logError("Failed to find Encoder 2 at 0x%02X", ENCODER2_ADDR);
+  } else {
+    logInfo("Encoder 2 initialized.");
+  }
+
+  if (!neokey.begin(NEOKEY_ADDR)) {
+    logError("Failed to find NeoKey 1x4 at 0x%02X", NEOKEY_ADDR);
+  } else {
+    logInfo("NeoKey 1x4 initialized.");
+  }
 }
 
 void print_inputs() {
