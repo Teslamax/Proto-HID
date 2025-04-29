@@ -40,12 +40,14 @@ void logError(const char* fmt, ...) {
   va_end(args);
 }
 
+static bool ledBlinkEnabled = LED_BLINK_ENABLED;
+
 static void pulseLed() {
-#if LED_BLINK_ENABLED
-  digitalWrite(LED_PIN, HIGH);
-  delayMicroseconds(2000);
-  digitalWrite(LED_PIN, LOW);
-#endif
+  if (ledBlinkEnabled) {
+    digitalWrite(LED_PIN, HIGH);
+    delayMicroseconds(2000);
+    digitalWrite(LED_PIN, LOW);
+  }
 }
 
 void cli_parser_init() {
@@ -61,6 +63,7 @@ static void handle_command(const String& cmd) {
   if (trimmed.equalsIgnoreCase("/help")) {
     Serial.println(F("🆘 Available commands:"));
     Serial.println(F("  /help         - Show this help message"));
+    Serial.println(F("  /ledblink on|off - Enable or disable LED blink feedback"));
     Serial.println(F("  /i2cscan      - Scan I2C bus for devices"));
     Serial.println(F("  /version      - Show firmware version"));
     Serial.println(F("  /echo on|off  - Enable or disable input echo"));
@@ -78,6 +81,14 @@ static void handle_command(const String& cmd) {
     } else {
       Serial.println(F("⚠️  Usage: /echo on|off"));
     }
+  }
+  else if (trimmed.equalsIgnoreCase("/ledblink on")) {
+    ledBlinkEnabled = true;
+    Serial.println(F("🛠 LED blink enabled"));
+  }
+  else if (trimmed.equalsIgnoreCase("/ledblink off")) {
+    ledBlinkEnabled = false;
+    Serial.println(F("🛠 LED blink disabled"));
   }
   else if (trimmed.equalsIgnoreCase("/i2cscan")) {
     Serial.println(F("🔍 Scanning I2C bus..."));
