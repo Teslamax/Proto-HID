@@ -1,0 +1,5 @@
+# Ignore Arduino build files
+build/
+*.hex
+*.elf
+*.bin
