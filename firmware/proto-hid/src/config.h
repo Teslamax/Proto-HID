@@ -26,3 +26,9 @@
 #define UART1_TIMEOUT_MS     100
 
 static uint8_t cdcLogLevel = 2;  // 0=errors, 1=warn+error, 2=info+warn+error, 3=all
+
+// ───────────── Enable hardware ─────────────
+#define USE_RTC         1
+#define USE_ETHERNET    1
+#define USE_SDLOGGER    1
+#define USE_DISPLAY     1
