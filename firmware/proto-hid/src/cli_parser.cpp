@@ -1,12 +1,14 @@
-// cli_parser.cpp - Handles serial CLI commands (e.g. /i2cscan, /help)
+// cli_parser.cpp - Handles serial CLI commands (e.g. /i2cscan, /help, /input, /inputmonitor)
 #include <Arduino.h>
-#include "cli_parser.h"
 #include <Wire.h>
+#include "cli_parser.h"
 #include "config.h"
+#include "input_manager.h"
 
 static String input_buffer;
 static bool at_line_start = true;
 static bool echo_enabled = ECHO_USER_INITIAL;
+static bool inputMonitorEnabled = false;
 
 void logInfo(const char* fmt, ...) {
   if (cdcLogLevel < 2) return;
@@ -40,10 +42,8 @@ void logError(const char* fmt, ...) {
   va_end(args);
 }
 
-static bool ledBlinkEnabled = LED_BLINK_ENABLED;
-
 static void pulseLed() {
-  if (ledBlinkEnabled) {
+  if (LED_BLINK_ENABLED) {
     digitalWrite(LED_PIN, HIGH);
     delayMicroseconds(2000);
     digitalWrite(LED_PIN, LOW);
@@ -56,17 +56,22 @@ void cli_parser_init() {
   Serial.println(F(FIRMWARE_BOOT_MSG));
 }
 
+bool cli_input_monitor_enabled() {
+  return inputMonitorEnabled;
+}
+
 static void handle_command(const String& cmd) {
   String trimmed = cmd;
   trimmed.trim();
 
   if (trimmed.equalsIgnoreCase("/help")) {
     Serial.println(F("🆘 Available commands:"));
-    Serial.println(F("  /help         - Show this help message"));
-    Serial.println(F("  /ledblink on|off - Enable or disable LED blink feedback"));
-    Serial.println(F("  /i2cscan      - Scan I2C bus for devices"));
-    Serial.println(F("  /version      - Show firmware version"));
-    Serial.println(F("  /echo on|off  - Enable or disable input echo"));
+    Serial.println(F("  /help               - Show this help message"));
+    Serial.println(F("  /i2cscan            - Scan I2C bus for devices"));
+    Serial.println(F("  /version            - Show firmware version"));
+    Serial.println(F("  /echo on|off        - Enable or disable input echo"));
+    Serial.println(F("  /input              - Print current input state"));
+    Serial.println(F("  /inputmonitor on|off - Enable or disable input change monitoring"));
   }
   else if (trimmed.equalsIgnoreCase("/version")) {
     Serial.println(F(FIRMWARE_NAME " v" FIRMWARE_VERSION " - " FIRMWARE_DESCRIPTION));
@@ -82,13 +87,16 @@ static void handle_command(const String& cmd) {
       Serial.println(F("⚠️  Usage: /echo on|off"));
     }
   }
-  else if (trimmed.equalsIgnoreCase("/ledblink on")) {
-    ledBlinkEnabled = true;
-    Serial.println(F("🛠 LED blink enabled"));
+  else if (trimmed.equalsIgnoreCase("/input")) {
+    print_inputs();
   }
-  else if (trimmed.equalsIgnoreCase("/ledblink off")) {
-    ledBlinkEnabled = false;
-    Serial.println(F("🛠 LED blink disabled"));
+  else if (trimmed.equalsIgnoreCase("/inputmonitor on")) {
+    inputMonitorEnabled = true;
+    Serial.println(F("🛠 Input monitor enabled"));
+  }
+  else if (trimmed.equalsIgnoreCase("/inputmonitor off")) {
+    inputMonitorEnabled = false;
+    Serial.println(F("🛠 Input monitor disabled"));
   }
   else if (trimmed.equalsIgnoreCase("/i2cscan")) {
     Serial.println(F("🔍 Scanning I2C bus..."));
