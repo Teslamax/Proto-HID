@@ -8,8 +8,49 @@ static String input_buffer;
 static bool at_line_start = true;
 static bool echo_enabled = ECHO_USER_INITIAL;
 
+void logInfo(const char* fmt, ...) {
+  if (cdcLogLevel < 2) return;
+  va_list args;
+  va_start(args, fmt);
+  Serial.print(CDC_INFO_PREFIX);
+  char buf[128];
+  vsnprintf(buf, sizeof(buf), fmt, args);
+  Serial.println(buf);
+  va_end(args);
+}
+
+void logWarn(const char* fmt, ...) {
+  if (cdcLogLevel < 1) return;
+  va_list args;
+  va_start(args, fmt);
+  Serial.print(CDC_WARN_PREFIX);
+  char buf[128];
+  vsnprintf(buf, sizeof(buf), fmt, args);
+  Serial.println(buf);
+  va_end(args);
+}
+
+void logError(const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  Serial.print(CDC_ERROR_PREFIX);
+  char buf[128];
+  vsnprintf(buf, sizeof(buf), fmt, args);
+  Serial.println(buf);
+  va_end(args);
+}
+
+static void pulseLed() {
+#if LED_BLINK_ENABLED
+  digitalWrite(LED_PIN, HIGH);
+  delayMicroseconds(2000);
+  digitalWrite(LED_PIN, LOW);
+#endif
+}
+
 void cli_parser_init() {
   input_buffer.reserve(128);
+  pinMode(LED_PIN, OUTPUT);
   Serial.println(F(FIRMWARE_BOOT_MSG));
 }
 
@@ -51,8 +92,7 @@ static void handle_command(const String& cmd) {
     Serial.println(F("✅ I2C scan complete."));
   }
   else {
-    Serial.print(F("❓ Unknown command: "));
-    Serial.println(trimmed);
+    logWarn("Unknown command: %s", trimmed.c_str());
   }
 }
 
@@ -63,7 +103,7 @@ void cli_parser_update() {
     if (at_line_start) {
       input_buffer = "";
       at_line_start = false;
-      if (echo_enabled) Serial.print(F("> "));
+      if (echo_enabled) Serial.print(ECHO_USER_PREFIX);
     }
 
     if (c == '\r') continue; // ignore carriage return
@@ -72,6 +112,7 @@ void cli_parser_update() {
       if (echo_enabled) Serial.println();
       input_buffer.trim();
       handle_command(input_buffer);
+      pulseLed();
       at_line_start = true;
       continue;
     }
