@@ -1,8 +1,5 @@
 #pragma once
 
-
-
-
 // ───────────── Firmware Info ─────────────
 #define FIRMWARE_NAME        "proto-hid"
 #define FIRMWARE_VERSION     "0.1.0"
