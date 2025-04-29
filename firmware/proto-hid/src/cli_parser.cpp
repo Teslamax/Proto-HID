@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "cli_parser.h"
 #include <Wire.h>
+#include "config.h"
 
 static String input_buffer;
 static bool at_line_start = true;
@@ -24,7 +25,7 @@ static void handle_command(const String& cmd) {
     Serial.println(F("  /echo on|off  - Enable or disable input echo"));
   }
   else if (trimmed.equalsIgnoreCase("/version")) {
-    Serial.println(F("proto-hid 0.1.0 - CLI/MIDI rotary controller"));
+    Serial.println(F(FIRMWARE_NAME " v" FIRMWARE_VERSION " - " FIRMWARE_DESCRIPTION));
   }
   else if (trimmed.startsWith("/echo ")) {
     if (trimmed.endsWith("on")) {
