@@ -6,11 +6,11 @@
 
 static String input_buffer;
 static bool at_line_start = true;
-static bool echo_enabled = true;
+static bool echo_enabled = ECHO_USER_INITIAL;
 
 void cli_parser_init() {
   input_buffer.reserve(128);
-  Serial.println(F("[cli_parser] Ready. Type /help for commands."));
+  Serial.println(F(FIRMWARE_BOOT_MSG));
 }
 
 static void handle_command(const String& cmd) {
